@@ -32,10 +32,10 @@ func Listen() {
 		}
 		json.NewEncoder(w).Encode(map[string]string{
 			"first_name": "Ture",
-			"last_name":  "Teknolog",
+			"last_name":  "Teknokrat",
 			"user":       "turetek",
 			"emails":     "turetek@kth.se",
-			"ugkthid":    "u1e9kghi",
+			"ugkthid":    "u1jwkms6",
 		})
 	})
 
