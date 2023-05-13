@@ -15,7 +15,7 @@ func init() {
 func Listen() {
 	h := http.NewServeMux()
 
-	h.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	h.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte("true"))
 	})
 
