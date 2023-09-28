@@ -47,6 +47,7 @@ func Listen(kthIDs <-chan string) {
 		http.Redirect(w, r, fmt.Sprintf("%s/%s", callback, "dummy-token"), http.StatusSeeOther)
 	})
 	h.HandleFunc("/verify/", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(user)
 	})
 
