@@ -24,3 +24,11 @@ docker build . -t nyckeln
 docker run -it --rm --name nyckeln \
     -p 7001:7001 -p 7002:7002 nyckeln
 ```
+
+The container is also published as a container at
+ghcr.io/datasektionen/nyckeln-under-dorrmattan, so you can also run it as
+```
+docker run -it --rm --name nyckeln \
+    -p 7001:7001 -p 7002:7002 ghcr.io/datasektionen/nyckeln-under-dorrmattan
+```
+without even having to clone this repository.
