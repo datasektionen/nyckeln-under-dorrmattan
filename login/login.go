@@ -33,6 +33,7 @@ type loginUser struct {
 func Listen(kthIDs <-chan string) {
 	h := http.NewServeMux()
 
+	// Fun fact: this is an acual user that actually exists in kth's systems
 	user := loginUser{
 		FirstName: "Ture",
 		LastName:  "Teknokrat",
