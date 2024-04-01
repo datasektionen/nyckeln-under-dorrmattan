@@ -1,6 +1,8 @@
 package login
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -51,15 +53,27 @@ func Listen(kthIDs <-chan string) {
 	}
 	fmt.Println("Now logging in as:", user.FirstName, user.LastName)
 
+	var tokenBytes [9]byte
+	if _, err := rand.Read(tokenBytes[:]); err != nil {
+		panic(err)
+	}
+	randomToken := base64.URLEncoding.EncodeToString(tokenBytes[:])
+
 	h.HandleFunc("/hello", func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte("Hello Login!!!!"))
 	})
 	h.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		callback := r.URL.Query().Get("callback")
-		callback = strings.TrimSuffix(callback, "/")
-		http.Redirect(w, r, fmt.Sprintf("%s/%s", callback, "dummy-token"), http.StatusSeeOther)
+		http.Redirect(w, r, callback+randomToken, http.StatusSeeOther)
 	})
-	h.HandleFunc("/verify/", func(w http.ResponseWriter, _ *http.Request) {
+	h.HandleFunc("/verify/{token}", func(w http.ResponseWriter, r *http.Request) {
+		token := r.PathValue("token")
+		token = strings.TrimSuffix(token, ".json")
+		if token != randomToken {
+			fmt.Printf("Invalid token received. Expected %s, got %s\n", randomToken, token)
+			http.Error(w, "Invalid code", http.StatusNotFound)
+			return
+		}
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(user)
 	})
