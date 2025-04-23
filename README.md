@@ -22,12 +22,19 @@ and log in as someone with enough privileges, such as the current kassör or d-s
 
 </details>
 
+Lastly, the sso part is a simple OpenID Connect (oidc) server which behaves the
+same way that sso does. You define your configuration and users in a yaml file,
+and then configure your favorite oidc client to use `http://localhost:{sso-port}/.well-known/openid-configuration`,
+and it should just work. When logging in, you will need to enter the username/kth-id of
+someone defined in your yaml config. Similarly to sso, also supports `pls_*` scopes.
+
 ## Configuration
 
 You can configure the following flags:
 
 * `login-port`: Port for the login service. Defaults to 7001.
 * `pls-port`: Port for the pls service. Defaults to 7002.
+* `sso-port`: Port for the sso service. Defaults to 7003.
 * `hoodis-url`: URL to the hodis instance. Defaults to `https://hodis.datasektionen.se`.
 * `kth-id`: Username to use for login. Defaults to `turetek`.
 * `config-file`: Path to a yaml config file. Defaults to `config.yaml`.
