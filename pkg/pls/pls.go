@@ -6,15 +6,15 @@ import (
 	"net/http"
 
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/config"
-	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/doi"
+	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/dao"
 )
 
-func Listen(cfg *config.Config, doi *doi.Doi) {
+func Listen(cfg *config.Config, dao *dao.Dao) {
 	h := http.NewServeMux()
 
 	h.HandleFunc("GET /api/user/{id}", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
-		groups := doi.GetUserGroups(id)
+		groups := dao.GetUserGroups(id)
 
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(groups)
@@ -23,7 +23,7 @@ func Listen(cfg *config.Config, doi *doi.Doi) {
 	h.HandleFunc("GET /api/user/{id}/{group}", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
 		group := r.PathValue("group")
-		permissions := doi.GetUserPermissionsForGroup(id, group)
+		permissions := dao.GetUserPermissionsForGroup(id, group)
 
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(permissions)
@@ -33,7 +33,7 @@ func Listen(cfg *config.Config, doi *doi.Doi) {
 		id := r.PathValue("id")
 		group := r.PathValue("group")
 		permisison := r.PathValue("permission")
-		has_permission := doi.HasPermission(id, group, permisison)
+		has_permission := dao.HasPermission(id, group, permisison)
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(has_permission)
 	})

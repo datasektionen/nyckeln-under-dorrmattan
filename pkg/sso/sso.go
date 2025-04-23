@@ -12,7 +12,7 @@ import (
 	"sync/atomic"
 
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/config"
-	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/doi"
+	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/dao"
 	jose "github.com/go-jose/go-jose/v4"
 	"github.com/google/uuid"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -50,7 +50,7 @@ type auth interface {
 	CheckLogin(kthid, id string) error
 }
 
-func Listen(cfg *config.Config, doi *doi.Doi) {
+func Listen(cfg *config.Config, dao *dao.Dao) {
 	logger := slog.New(
 		slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 			AddSource: true,
@@ -71,7 +71,7 @@ func Listen(cfg *config.Config, doi *doi.Doi) {
 		authRequests: make(map[string]*authRequest),
 		codes:        make(map[string]string),
 		tokens:       make(map[string]*accessToken),
-		doi:          doi,
+		dao:          dao,
 	}
 	var opts []op.Option
 

@@ -1,16 +1,18 @@
-package doi
+package dao
 
 import (
 	"fmt"
 	"os"
 	"time"
 
+	"maps"
+
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/config"
 	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
 
-type Doi struct {
+type Dao struct {
 	cfg *config.Config
 	db  db
 }
@@ -28,25 +30,20 @@ type Client struct {
 }
 
 type User struct {
-	KTHID                   string       `yaml:"kth_id"`
-	UGKTHID                 string       `yaml:"ug_kth_id"`
-	Email                   string       `yaml:"email"`
-	FirstName               string       `yaml:"first_name"`
-	FamilyName              string       `yaml:"family_name"`
-	YearTag                 string       `yaml:"year_tag"`
-	MemberTo                time.Time    `yaml:"member_to"`
-	WebAuthnID              []byte       `yaml:"web_authn_id"`
-	FirstNameChangeRequest  string       `yaml:"first_name_change_request"`
-	FamilyNameChangeRequest string       `yaml:"family_name_change_request"`
-	PlsPermissions          []Permission `yaml:"pls_permissions"`
+	KTHID                   string              `yaml:"kth_id"`
+	UGKTHID                 string              `yaml:"ug_kth_id"`
+	Email                   string              `yaml:"email"`
+	FirstName               string              `yaml:"first_name"`
+	FamilyName              string              `yaml:"family_name"`
+	YearTag                 string              `yaml:"year_tag"`
+	MemberTo                time.Time           `yaml:"member_to"`
+	WebAuthnID              []byte              `yaml:"web_authn_id"`
+	FirstNameChangeRequest  string              `yaml:"first_name_change_request"`
+	FamilyNameChangeRequest string              `yaml:"family_name_change_request"`
+	PlsPermissions          map[string][]string `yaml:"pls_permissions"`
 }
 
-type Permission struct {
-	Group       string   `yaml:"group"`
-	Permissions []string `yaml:"permissions"`
-}
-
-func New(cfg *config.Config) *Doi {
+func New(cfg *config.Config) *Dao {
 	file, err := os.ReadFile(cfg.ConfigFile)
 	if err != nil {
 		panic(err)
@@ -60,17 +57,15 @@ func New(cfg *config.Config) *Doi {
 	db.permissions = make(map[string]map[string][]string)
 	for _, user := range db.Users {
 		db.permissions[user.KTHID] = make(map[string][]string)
-		for _, permission := range user.PlsPermissions {
-			db.permissions[user.KTHID][permission.Group] = permission.Permissions
-		}
+		maps.Copy(db.permissions[user.KTHID], user.PlsPermissions)
 	}
 
-	return &Doi{
+	return &Dao{
 		db: db,
 	}
 }
 
-func (d *Doi) GetClient(id string) (*Client, error) {
+func (d *Dao) GetClient(id string) (*Client, error) {
 	for _, client := range d.db.Clients {
 		if client.Id == id {
 			return &client, nil
@@ -79,7 +74,7 @@ func (d *Doi) GetClient(id string) (*Client, error) {
 	return nil, fmt.Errorf("client not found")
 }
 
-func (d *Doi) GetUser(kthid string) (*User, error) {
+func (d *Dao) GetUser(kthid string) (*User, error) {
 	for _, user := range d.db.Users {
 		if user.KTHID == kthid {
 			return &user, nil
@@ -88,21 +83,21 @@ func (d *Doi) GetUser(kthid string) (*User, error) {
 	return nil, fmt.Errorf("user not found")
 }
 
-func (d *Doi) GetUserPermissionsForGroup(kthid string, group string) []string {
+func (d *Dao) GetUserPermissionsForGroup(kthid string, group string) []string {
 	if permissions, ok := d.db.permissions[kthid][group]; ok {
 		return permissions
 	}
 	return []string{}
 }
 
-func (d *Doi) GetUserGroups(kthid string) map[string][]string {
+func (d *Dao) GetUserGroups(kthid string) map[string][]string {
 	if groups, ok := d.db.permissions[kthid]; ok {
 		return groups
 	}
 	return map[string][]string{}
 }
 
-func (d *Doi) HasPermission(kthid string, group string, permission string) bool {
+func (d *Dao) HasPermission(kthid string, group string, permission string) bool {
 	if groups, ok := d.db.permissions[kthid][group]; ok {
 		return slices.Contains(groups, permission)
 	}

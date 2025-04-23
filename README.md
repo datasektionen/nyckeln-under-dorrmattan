@@ -35,7 +35,7 @@ You can configure the following flags:
 * `login-port`: Port for the login service. Defaults to 7001.
 * `pls-port`: Port for the pls service. Defaults to 7002.
 * `sso-port`: Port for the sso service. Defaults to 7003.
-* `hoodis-url`: URL to the hodis instance. Defaults to `https://hodis.datasektionen.se`.
+* `hodis-url`: URL to the hodis instance. Defaults to `https://hodis.datasektionen.se`.
 * `kth-id`: Username to use for login. Defaults to `turetek`.
 * `config-file`: Path to a yaml config file. Defaults to `config.yaml`.
 
@@ -60,10 +60,10 @@ users:
     first_name: Ture
     family_name: Teknolog
     pls_permissions:
-      - group: sso
-        permissions: [admin]
-      - group: calypso
-        permissions: [drek, dfunkt]
+      sso: [admin]
+      calypso:
+        - drek
+        - dfunk
 ```
 
 

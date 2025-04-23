@@ -16,7 +16,8 @@ users:
     first_name: Ture
     family_name: Teknolog
     pls_permissions:
-      - group: sso
-        permissions: [admin]
-      - group: calypso
-        permissions: [drek, dfunkt]
+      sso:
+        - admin
+      calypso:
+        - drek
+        - dfunk

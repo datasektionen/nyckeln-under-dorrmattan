@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/doi"
+	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/dao"
 	jose "github.com/go-jose/go-jose/v4"
 	"github.com/google/uuid"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
@@ -22,7 +22,7 @@ type storage struct {
 	tokens       map[string]*accessToken
 	signingKey   signingKey
 
-	doi *doi.Doi
+	dao *dao.Dao
 }
 
 type accessToken struct {
@@ -57,7 +57,7 @@ func (s *storage) AuthRequestByCode(ctx context.Context, code string) (op.AuthRe
 
 // AuthorizeClientIDSecret implements the op.Storage interface
 func (s *storage) AuthorizeClientIDSecret(ctx context.Context, clientID, clientSecret string) error {
-	client, err := s.doi.GetClient(clientID)
+	client, err := s.dao.GetClient(clientID)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (s *storage) DeleteAuthRequest(ctx context.Context, id string) error {
 
 // GetClientByClientID implements the op.Storage interface
 func (s *storage) GetClientByClientID(ctx context.Context, clientID string) (op.Client, error) {
-	c, err := s.doi.GetClient(clientID)
+	c, err := s.dao.GetClient(clientID)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (s *storage) CheckLogin(kthid, id string) error {
 		return fmt.Errorf("request not found")
 	}
 
-	user, err := s.doi.GetUser(kthid)
+	user, err := s.dao.GetUser(kthid)
 	if err != nil {
 		return err
 	}
@@ -192,7 +192,7 @@ func (s *storage) SetIntrospectionFromToken(ctx context.Context, userinfo *oidc.
 
 // SetUserinfoFromScopes implements op.Storage.
 func (s *storage) SetUserinfoFromScopes(ctx context.Context, userinfo *oidc.UserInfo, kthid string, clientID string, scopes []string) error {
-	user, err := s.doi.GetUser(kthid)
+	user, err := s.dao.GetUser(kthid)
 	if err != nil {
 		return err
 	}
@@ -219,7 +219,7 @@ func (s *storage) SetUserinfoFromToken(ctx context.Context, userinfo *oidc.UserI
 		return fmt.Errorf("You're asking to get info about a different user than who the token is for")
 	}
 
-	user, err := s.doi.GetUser(kthid)
+	user, err := s.dao.GetUser(kthid)
 	if err != nil {
 		return err
 	}
@@ -231,7 +231,7 @@ func (s *storage) SetUserinfoFromToken(ctx context.Context, userinfo *oidc.UserI
 	return nil
 }
 
-func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user *doi.User, scopes []string) error {
+func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user *dao.User, scopes []string) error {
 	if userinfo.Claims == nil {
 		userinfo.Claims = make(map[string]any)
 	}
@@ -252,7 +252,7 @@ func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user
 
 		default:
 			if group, ok := strings.CutPrefix(scope, "pls_"); ok {
-				perms := s.doi.GetUserPermissionsForGroup(user.KTHID, group)
+				perms := s.dao.GetUserPermissionsForGroup(user.KTHID, group)
 				userinfo.Claims[scope] = perms
 			}
 		}
