@@ -32,11 +32,11 @@ someone defined in your yaml config. Similarly to sso, also supports `pls_*` sco
 
 You can configure the following flags:
 
-* `login-port`: Port for the login service. Defaults to 7001.
-* `pls-port`: Port for the pls service. Defaults to 7002.
+* `pls-port`: Port for the pls service. Defaults to 7001.
+* `login-port`: Port for the login service. Defaults to 7002.
 * `sso-port`: Port for the sso service. Defaults to 7003.
 * `hodis-url`: URL to the hodis instance. Defaults to `https://hodis.datasektionen.se`.
-* `kth-id`: Username to use for login. Defaults to `turetek`.
+* `kth-id`: Username to use for login. Defaults to `KTH_ID` environment variable, or `turetek` if not set.
 * `config-file`: Path to a yaml config file. Defaults to `config.yaml`.
 
 The yaml config file is used for SSO (oidc) and pls configuration. For example:
