@@ -4,22 +4,12 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
+
+	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/config"
 )
-
-var port int
-var hodisURL string
-var initKTHID string
-
-func init() {
-	flag.IntVar(&port, "login-port", 7002, "port to listen on for login")
-	flag.StringVar(&hodisURL, "hodis-url", "https://hodis.datasektionen.se", "url to hodis")
-	flag.StringVar(&initKTHID, "kth-id", os.Getenv("KTH_ID"), "kth id to login as. can be overwritten by writing on stdin")
-}
 
 type loginUser struct {
 	FirstName string `json:"first_name"`
@@ -32,7 +22,7 @@ type loginUser struct {
 // Mocks https://login.datasektionen.se
 // If a kthID is sent on the channel, it will be used to fetch the user from
 // hodis and make subsequent login requests return that user.
-func Listen(kthIDs <-chan string) {
+func Listen(cfg *config.Config, kthIDs <-chan string) {
 	h := http.NewServeMux()
 
 	// Fun fact: this is an acual user that actually exists in kth's systems
@@ -44,8 +34,8 @@ func Listen(kthIDs <-chan string) {
 		UGKthid:   "u1jwkms6",
 	}
 
-	if initKTHID != "" {
-		if u, err := getUserFromHodis(initKTHID); err != nil {
+	if cfg.InitKTHID != "" {
+		if u, err := getUserFromHodis(cfg.HodisURL, cfg.InitKTHID); err != nil {
 			fmt.Println(err)
 		} else {
 			user = u
@@ -79,14 +69,14 @@ func Listen(kthIDs <-chan string) {
 	})
 
 	go func() {
-		fmt.Printf("login listening on http://localhost:%d\n", port)
-		if err := http.ListenAndServe(fmt.Sprintf(":%d", port), h); err != nil {
+		fmt.Printf("login listening on http://localhost:%s\n", cfg.LoginPort)
+		if err := http.ListenAndServe(fmt.Sprintf(":%s", cfg.LoginPort), h); err != nil {
 			panic(err)
 		}
 	}()
 	for kthID := range kthIDs {
 		var err error
-		user, err = getUserFromHodis(kthID)
+		user, err = getUserFromHodis(cfg.HodisURL, kthID)
 		if err != nil {
 			fmt.Println(err)
 			fmt.Println("Still logging in as:", user.FirstName, user.LastName)
@@ -96,7 +86,7 @@ func Listen(kthIDs <-chan string) {
 	}
 }
 
-func getUserFromHodis(kthID string) (loginUser, error) {
+func getUserFromHodis(hodisURL, kthID string) (loginUser, error) {
 	res, err := http.Get(hodisURL + "/users/" + kthID)
 	if err != nil {
 		return loginUser{}, nil
