@@ -76,14 +76,50 @@ To build and run with docker using the default ports:
 ```
 docker build . -t nyckeln
 docker run -it --rm --name nyckeln \
+    -v /path/to/your/config.yaml:/config.yaml \
     -p 7001:7001 -p 7002:7002 -p 7003:7003 nyckeln
 ```
 
 The container is also published as a container at
 ghcr.io/datasektionen/nyckeln-under-dorrmattan, so you can also run it as
+
 ```
 docker run -it --rm --name nyckeln \
-    -p 7001:7001 -p 7002:7002 -p 7003:7003 ghcr.io/datasektionen/nyckeln-under-dorrmattan
+    -v /path/to/your/config.yaml:/config.yaml \
+    -p 701:7001 -p 7002:7002 -p 7003:7003 ghcr.io/datasektionen/nyckeln-under-dorrmattan
 ```
-without even having to clone this repository. You can also add it to your dev
-`docer-compose.yml` file.
+
+Without even having to clone this repository. You can also add it to your dev
+`docker-compose.yaml` file.
+
+```yaml
+services:
+  nyckeln:
+    image: ghcr.io/datasektionen/nyckeln-under-dorrmattan
+    configs:
+      - source: nyckeln.yaml
+        target: /config.yaml
+    ports:
+      - 7001:7001
+      - 7002:7002
+      - 7003:7003
+
+configs:
+  nyckeln.yaml:
+    content: |
+      clients:
+        - id: "client-id"
+          secret: "client-secret"
+          redirect_uris:
+            - "http://localhost:4000/oidcc/callback"
+            - "http://localhost:4000/oidcc/authorize"
+
+      users:
+        - kth_id: turetek
+          email: turetek@kth.se
+          first_name: Ture
+          family_name: Teknolog
+          pls_permissions:
+            sso:
+              - fippel
+```

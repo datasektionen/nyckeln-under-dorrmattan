@@ -14,6 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /nyckeln
 FROM alpine:3.19
 
 COPY --from=build /nyckeln /nyckeln
+COPY config.yaml ./
 
 CMD ["/nyckeln"]
 
