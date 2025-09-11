@@ -46,6 +46,8 @@ var (
 	counter atomic.Int64
 )
 
+var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "pls_*", "year"}
+
 type auth interface {
 	CheckLogin(kthid, id string) error
 }
@@ -85,10 +87,9 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			"name", "family_name", "given_name",
 			"email", "email_verified",
 			"pls_*",
+			"year_tag",
 		},
-		SupportedScopes: []string{
-			"openid", "profile", "email", "offline_access", "pls_*",
-		},
+		SupportedScopes: SupportedScopes,
 	}, &storage, op.StaticIssuer(issuer), opts...)
 	if err != nil {
 		logger.Error("failed to create provider", "error", err)
