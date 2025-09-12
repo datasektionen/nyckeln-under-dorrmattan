@@ -250,8 +250,8 @@ func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user
 			userinfo.Email = user.Email
 			userinfo.EmailVerified = true
 
-		case "year":
-			userinfo.Claims["year_tag"] = user.YearTag
+		case "year_tag":
+			userinfo.Claims[scope] = user.YearTag
 
 		default:
 			if group, ok := strings.CutPrefix(scope, "pls_"); ok {

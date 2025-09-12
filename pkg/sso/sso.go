@@ -46,7 +46,7 @@ var (
 	counter atomic.Int64
 )
 
-var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "pls_*", "year"}
+var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "pls_*", "year_tag"}
 
 type auth interface {
 	CheckLogin(kthid, id string) error
