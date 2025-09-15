@@ -1,7 +1,7 @@
 # Nyckeln under dörrmattan
 
 Mock version of [login](https://github.com/datasektionen/login),
-[pls](https://github.com/datasektionen/pls), and [sso](https://github.com/datasektionen/sso).
+[pls](https://github.com/datasektionen/pls), [hive](https://github.com/datasektionen/hive), and [sso](https://github.com/datasektionen/sso).
 
 The login part can be used as a drop in replacement, but it requires no
 configuration, and automatically lets everyone in as Ture Teknolog. You
@@ -10,16 +10,26 @@ requests be for that user. Data is then fetched from hodis.
 
 The pls part only implements a subset of the pls API. Feel free to extend
 it if you need more. If that isn't good enough, use the pls in production
-and log in as someone with enough privileges, such as the current kassör or d-sys.
+and log in as someone with enough privileges, such as the current kassör or d-sys. The
+same applies to Hive.
 
 <details>
 <summary>Pls API</summary>
 <br>
 
-* `GET /api/user/:id`, returns all map of groups with a list of permissions for a user
-* `GET /api/user/:id/:group`, returns a list all group permissions for a user
-* `GET /api/user/:id/:group/:permission`, returns true or false if a user has the permission
+- `GET /api/user/:id`, returns all map of groups with a list of permissions for a user
+- `GET /api/user/:id/:group`, returns a list all group permissions for a user
+- `GET /api/user/:id/:group/:permission`, returns true or false if a user has the permission
 
+</details>
+
+<details>
+<summary>Hive API</summary>
+<br>
+
+As in real Hive, you need to supply an `Authentication` header with `Bearer <token>` to access the API. The hard-coded token is `"fake-hive-token"`.
+
+- `GET /api/v1/user/:id/permissions`, returns a list of hive permissions for a user
 </details>
 
 Lastly, the sso part is a simple OpenID Connect (oidc) server which behaves the
@@ -32,12 +42,13 @@ someone defined in your yaml config. Similarly to sso, also supports `pls_*` sco
 
 You can configure the following flags:
 
-* `pls-port`: Port for the pls service. Defaults to 7001.
-* `login-port`: Port for the login service. Defaults to 7002.
-* `sso-port`: Port for the sso service. Defaults to 7003.
-* `hodis-url`: URL to the hodis instance. Defaults to `https://hodis.datasektionen.se`.
-* `kth-id`: Username to use for login. Defaults to `KTH_ID` environment variable, or `turetek` if not set.
-* `config-file`: Path to a yaml config file. Defaults to `config.yaml`.
+- `pls-port`: Port for the pls service. Defaults to 7001.
+- `login-port`: Port for the login service. Defaults to 7002.
+- `sso-port`: Port for the sso service. Defaults to 7003.
+- `hive-port`: Port for the hive service. Defaults to 7004.
+- `hodis-url`: URL to the hodis instance. Defaults to `https://hodis.datasektionen.se`.
+- `kth-id`: Username to use for login. Defaults to `KTH_ID` environment variable, or `turetek` if not set.
+- `config-file`: Path to a yaml config file. Defaults to `config.yaml`.
 
 The yaml config file is used for SSO (oidc) and pls configuration. For example:
 
@@ -64,20 +75,24 @@ users:
       calypso:
         - drek
         - dfunk
+    hive_permissions:
+      - id: admin
+        scope: null
 ```
-
 
 To build and run without docker and specifying custom ports:
+
 ```
-go run . -login-port 1337 -pls-port 1338 -sso-port 1339 -config-file my.config.yaml
+go run . -login-port 1337 -pls-port 1338 -sso-port 1339 -hive-port 1340 -config-file my.config.yaml
 ```
 
 To build and run with docker using the default ports:
+
 ```
 docker build . -t nyckeln
 docker run -it --rm --name nyckeln \
     -v /path/to/your/config.yaml:/config.yaml \
-    -p 7001:7001 -p 7002:7002 -p 7003:7003 nyckeln
+    -p 7001:7001 -p 7002:7002 -p 7003:7003 -p 7004:7004 nyckeln
 ```
 
 The container is also published as a container at
@@ -86,7 +101,7 @@ ghcr.io/datasektionen/nyckeln-under-dorrmattan, so you can also run it as
 ```
 docker run -it --rm --name nyckeln \
     -v /path/to/your/config.yaml:/config.yaml \
-    -p 701:7001 -p 7002:7002 -p 7003:7003 ghcr.io/datasektionen/nyckeln-under-dorrmattan
+    -p 701:7001 -p 7002:7002 -p 7003:7003 -p 7004:7004 ghcr.io/datasektionen/nyckeln-under-dorrmattan
 ```
 
 Without even having to clone this repository. You can also add it to your dev
@@ -103,6 +118,7 @@ services:
       - 7001:7001
       - 7002:7002
       - 7003:7003
+      - 7004:7004
 
 configs:
   nyckeln.yaml:
@@ -119,6 +135,9 @@ configs:
           email: turetek@kth.se
           first_name: Ture
           family_name: Teknolog
+          hive_permissions:
+            - id: admin
+              scope: null
           pls_permissions:
             sso:
               - fippel
