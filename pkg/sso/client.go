@@ -71,6 +71,17 @@ func (c client) IsScopeAllowed(scope string) bool {
 	if after, ok := strings.CutPrefix(scope, "pls_"); ok {
 		return len(after) > 0
 	}
+
+	for _, supported := range SupportedScopes {
+		if prefix, ok := strings.CutSuffix(supported, "*"); ok {
+			if strings.HasPrefix(scope, prefix) {
+				return true
+			}
+		} else if supported == scope {
+			return true
+		}
+	}
+
 	return false
 }
 
