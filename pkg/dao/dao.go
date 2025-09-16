@@ -29,6 +29,11 @@ type Client struct {
 	RedirectURIs []string `yaml:"redirect_uris"`
 }
 
+type HivePermission struct {
+	Id    string  `yaml:"id" json:"id"`
+	Scope *string `yaml:"scope" json:"scope"`
+}
+
 type User struct {
 	KTHID                   string              `yaml:"kth_id"`
 	UGKTHID                 string              `yaml:"ug_kth_id"`
@@ -41,6 +46,7 @@ type User struct {
 	FirstNameChangeRequest  string              `yaml:"first_name_change_request"`
 	FamilyNameChangeRequest string              `yaml:"family_name_change_request"`
 	PlsPermissions          map[string][]string `yaml:"pls_permissions"`
+	HivePermissions         []HivePermission    `yaml:"hive_permissions"`
 }
 
 func New(cfg *config.Config) *Dao {
@@ -102,4 +108,14 @@ func (d *Dao) HasPermission(kthid string, group string, permission string) bool 
 		return slices.Contains(groups, permission)
 	}
 	return false
+}
+
+func (d *Dao) GetHivePermissions(kthid string) []HivePermission {
+	permissions := []HivePermission{}
+	for _, user := range d.db.Users {
+		if user.KTHID == kthid {
+			permissions = append(permissions, user.HivePermissions...)
+		}
+	}
+	return permissions
 }
