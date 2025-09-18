@@ -27,9 +27,22 @@ same applies to Hive.
 <summary>Hive API</summary>
 <br>
 
-As in real Hive, you need to supply an `Authentication` header with `Bearer <token>` to access the API. The hard-coded token is `"fake-hive-token"`.
+As in real Hive, you need to supply an `Authentication` header with `Bearer <token>` to access the API. Any token will be accepted.
 
 - `GET /api/v1/user/:id/permissions`, returns a list of hive permissions for a user
+- `GET /api/v1/user/:id/permission/:perm_id`, returns true or false if a user has the permmission
+- `GET /api/v1/user/:id/permissions/:perm_id/scopes`, returns a list of scopes for a specific permission
+- `GET /api/v1/user/:id/permissions/:perm_id/scope/:scope`, returns true or false if a user has a specific scope
+
+- `GET /api/v1/token/:secret/permissions`, returns a list of hive permissions for a token
+- `GET /api/v1/token/:secret/permission/:perm_id`, returns a list of hive permissions for a token
+- `GET /api/v1/token/:secret/permission/:perm_id/scopes`, returns a list of scopes for a specific permission
+- `GET /api/v1/token/:secret/permission/:perm_id/scope/:scope`, returns true or false if the token has a specific scope
+
+- `GET /api/v1/tagged/:tag_id/groups`, returns a list of groups that have that tag
+- `GET /api/v1/tagged/:tag_id/memberships/:username`, returns all the groups that the user is part of and has the tag
+- `GET /api/v1/tagged/:tag_id/users`, returns a list of all users who have the tag
+- `GET /api/v1/group/:group_domain/:group_id/members`, returns a list of all members in group
 </details>
 
 Lastly, the sso part is a simple OpenID Connect (oidc) server which behaves the

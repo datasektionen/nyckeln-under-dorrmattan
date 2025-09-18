@@ -20,6 +20,7 @@ type Dao struct {
 type db struct {
 	Clients     []Client `yaml:"clients"`
 	Users       []User   `yaml:"users"`
+	Hive        Hive     `yaml:"hive"`
 	permissions map[string]map[string][]string
 }
 
@@ -29,9 +30,45 @@ type Client struct {
 	RedirectURIs []string `yaml:"redirect_uris"`
 }
 
+type Hive struct {
+	Tokens []HiveToken `yaml:"tokens"`
+	Groups []HiveGroup `yaml:"groups"`
+}
+
+type HiveToken struct {
+	Secret      string           `yaml:"secret"`
+	Permissions []HivePermission `yaml:"permissions"`
+}
+
+type HiveGroup struct {
+	Name        string           `yaml:"name"`
+	Id          string           `yaml:"id"`
+	Domain      string           `yaml:"domain"`
+	Members     []string         `yaml:"members"`
+	Tags        []HiveTag        `yaml:"tags"`
+	Permissions []HivePermission `yaml:"permissions"`
+}
+
+type HiveTag struct {
+	Id      string `yaml:"id"`
+	Content string `yaml:"content"`
+}
+
 type HivePermission struct {
-	Id    string  `yaml:"id" json:"id"`
-	Scope *string `yaml:"scope" json:"scope"`
+	Id    string `yaml:"id" json:"id"`
+	Scope string `yaml:"scope" json:"scope"`
+}
+
+type HiveTagGroup struct {
+	GroupName   string
+	GroupId     string
+	GroupDomain string
+	TagContent  string
+}
+
+type HiveTagUser struct {
+	Username   string
+	TagContent string
 }
 
 type User struct {
@@ -46,7 +83,7 @@ type User struct {
 	FirstNameChangeRequest  string              `yaml:"first_name_change_request"`
 	FamilyNameChangeRequest string              `yaml:"family_name_change_request"`
 	PlsPermissions          map[string][]string `yaml:"pls_permissions"`
-	HivePermissions         []HivePermission    `yaml:"hive_permissions"`
+	HiveTags				[]HiveTag			`yaml:"hive_tags"`
 }
 
 func New(cfg *config.Config) *Dao {
@@ -112,10 +149,84 @@ func (d *Dao) HasPermission(kthid string, group string, permission string) bool 
 
 func (d *Dao) GetHivePermissions(kthid string) []HivePermission {
 	permissions := []HivePermission{}
-	for _, user := range d.db.Users {
-		if user.KTHID == kthid {
-			permissions = append(permissions, user.HivePermissions...)
+	for _, group := range d.db.Hive.Groups {
+		for _, user := range group.Members {
+			if user == kthid {
+				permissions = append(permissions, group.Permissions...)
+			}
 		}
 	}
 	return permissions
+}
+
+func (d *Dao) GetHivePermissionsToken(tokenId string) []HivePermission {
+	permissions := []HivePermission{}
+
+	for _, token := range d.db.Hive.Tokens {
+		if token.Secret == tokenId {
+			for _, permission := range token.Permissions {
+				permissions = append(permissions, permission)
+			}
+		}
+	}
+
+	return permissions
+}
+
+func (d *Dao) GetHiveTagGroups(tagId string) []HiveTagGroup {
+	tagGroups := []HiveTagGroup{}
+	for _, group := range d.db.Hive.Groups {
+		for _, tag := range group.Tags {
+			if tag.Id == tagId {
+				tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+			}
+		}
+	}
+
+	return tagGroups
+}
+
+func (d *Dao) GetHiveTagGroupsUser(tagId string, kthid string) []HiveTagGroup {
+	tagGroups := []HiveTagGroup{}
+	for _, group := range d.db.Hive.Groups {
+		for _, user := range group.Members {
+			if user == kthid {
+				for _, tag := range group.Tags {
+					if tag.Id == tagId {
+						tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+					}
+				}
+			}
+		}
+	}
+
+	return tagGroups
+}
+
+func (d *Dao) GetHiveUsersWithTag(tagId string) []HiveTagUser {
+	tagUsers := []HiveTagUser{}
+
+	for _, user := range d.db.Users {
+		for _, tag := range user.HiveTags {
+			if tag.Id == tagId {
+				tagUsers = append(tagUsers, HiveTagUser{Username: user.KTHID, TagContent: tag.Content})
+			}
+		}
+	}
+
+	return tagUsers
+}
+
+func (d *Dao) GetHiveMembership(groupDomain string, groupId string) []string {
+	members := make([]string, 0)
+
+	for _, group := range d.db.Hive.Groups {
+		if group.Domain == groupDomain && group.Id == groupId {
+			for _, user := range group.Members {
+				members = append(members, user)
+			}
+		}
+	}
+
+	return members
 }
