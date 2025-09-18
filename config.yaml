@@ -21,6 +21,9 @@ users:
       calypso:
         - drek
         - dfunk
+    hive_tags:
+      - id: personal_email
+        content: turetek@gmail.com
 
 hive:
   tokens:

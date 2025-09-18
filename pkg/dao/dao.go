@@ -83,6 +83,7 @@ type User struct {
 	FirstNameChangeRequest  string              `yaml:"first_name_change_request"`
 	FamilyNameChangeRequest string              `yaml:"family_name_change_request"`
 	PlsPermissions          map[string][]string `yaml:"pls_permissions"`
+	HiveTags				[]HiveTag			`yaml:"hive_tags"`
 }
 
 func New(cfg *config.Config) *Dao {
@@ -205,12 +206,10 @@ func (d *Dao) GetHiveTagGroupsUser(tagId string, kthid string) []HiveTagGroup {
 func (d *Dao) GetHiveUsersWithTag(tagId string) []HiveTagUser {
 	tagUsers := []HiveTagUser{}
 
-	for _, group := range d.db.Hive.Groups {
-		for _, tag := range group.Tags {
+	for _, user := range d.db.Users {
+		for _, tag := range user.HiveTags {
 			if tag.Id == tagId {
-				for _, user := range group.Members {
-					tagUsers = append(tagUsers, HiveTagUser{Username: user, TagContent: tag.Content})
-				}
+				tagUsers = append(tagUsers, HiveTagUser{Username: user.KTHID, TagContent: tag.Content})
 			}
 		}
 	}
