@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log/slog"
@@ -50,6 +51,13 @@ var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "
 
 type auth interface {
 	CheckLogin(kthid, id string) error
+}
+
+type ssoUser struct {
+	Email      string `json:"email"`
+	FirstName  string `json:"firstName"`
+	FamilyName string `json:"familyName"`
+	YearTag    string `json:"yearTag"`
 }
 
 func Listen(cfg *config.Config, dao *dao.Dao) {
@@ -102,6 +110,55 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	mux.Handle("/login", loginHandler)
 	mux.Handle("/", provider.Handler)
+
+	mux.HandleFunc("GET /api/users", func(w http.ResponseWriter, r *http.Request) {
+
+		query := r.URL.Query()
+
+		format := query["format"]
+		kthids := query["u"]
+
+		switch format[0] {
+		case "singel":
+			if len(kthids) != 1 {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			user, err := dao.GetUser(kthids[0])
+			if err != nil {
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+			resp := ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag}
+			w.Header().Add("Content-Type", "application/json;charset=utf-8")
+			json.NewEncoder(w).Encode(resp)
+		case "array":
+			users := []ssoUser{}
+			for _, kthid := range kthids {
+				user, err := dao.GetUser(kthid)
+				if err != nil {
+					users = append(users, ssoUser{})
+				} else {
+					users = append(users, ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag})
+				}
+			}
+			w.Header().Add("Content-Type", "application/json;charset=utf-8")
+			json.NewEncoder(w).Encode(users)
+		case "map":
+			users := make(map[string]ssoUser)
+			for _, kthid := range kthids {
+				user, err := dao.GetUser(kthid)
+				if err == nil {
+					users[kthid] = ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag}
+				}
+			}
+			w.Header().Add("Content-Type", "application/json;charset=utf-8")
+			json.NewEncoder(w).Encode(users)
+		default:
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	})
 
 	handler := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
