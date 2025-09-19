@@ -130,7 +130,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 				return
 			}
 			resp := ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag}
-			w.Header().Add("Content-Type", "application/json;charset=utf-8")
+			w.Header().Add("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(resp)
 		case "array":
 			users := []ssoUser{}
@@ -142,7 +142,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 					users = append(users, ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag})
 				}
 			}
-			w.Header().Add("Content-Type", "application/json;charset=utf-8")
+			w.Header().Add("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(users)
 		case "map":
 			users := make(map[string]ssoUser)
@@ -152,7 +152,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 					users[kthid] = ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag}
 				}
 			}
-			w.Header().Add("Content-Type", "application/json;charset=utf-8")
+			w.Header().Add("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(users)
 		default:
 			w.WriteHeader(http.StatusNotFound)
