@@ -54,10 +54,10 @@ type auth interface {
 }
 
 type ssoUser struct {
-	Email      string `json:"email"`
-	FirstName  string `json:"firstName"`
-	FamilyName string `json:"familyName"`
-	YearTag    string `json:"yearTag"`
+	Email      string `json:"email,omitempty"`
+	FirstName  string `json:"firstName,omitempty"`
+	FamilyName string `json:"familyName,omitempty"`
+	YearTag    string `json:"yearTag,omitempty"`
 }
 
 func Listen(cfg *config.Config, dao *dao.Dao) {
