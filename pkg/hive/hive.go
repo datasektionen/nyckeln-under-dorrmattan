@@ -17,7 +17,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/user/{id}/permissions", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -31,7 +31,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/user/{id}/permission/{perm_id}", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -54,7 +54,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/user/{id}/permission/{perm_id}/scopes", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -77,7 +77,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/user/{id}/permission/{perm_id}/scope/{scope}", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -103,7 +103,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/token/{secret}/permissions", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -117,7 +117,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/token/{secret}/permission/{perm_id}", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -140,7 +140,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/token/{secret}/permission/{perm_id}/scopes", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -163,7 +163,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/token/{secret}/permission/{perm_id}/scope/{scope}", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -189,7 +189,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/tagged/{tag_id}/groups", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -203,7 +203,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/tagged/{tag_id}/memberships/{username}", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -218,7 +218,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/tagged/{tag_id}/users", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
@@ -232,7 +232,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 	h.HandleFunc("GET /api/v1/group/{group_domain}/{group_id}/members", func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
-		if strings.Contains(authHeader, "Bearer") {
+		if !strings.Contains(authHeader, "Bearer") {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
