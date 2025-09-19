@@ -119,7 +119,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 		kthids := query["u"]
 
 		switch format[0] {
-		case "singel":
+		case "single":
 			if len(kthids) != 1 {
 				w.WriteHeader(http.StatusBadRequest)
 				return
