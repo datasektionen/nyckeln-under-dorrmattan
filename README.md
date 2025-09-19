@@ -91,13 +91,35 @@ users:
     first_name: Ture
     family_name: Teknolog
     pls_permissions:
-      sso: [admin]
+      sso:
+        - admin
       calypso:
         - drek
         - dfunk
-    hive_permissions:
-      - id: admin
-        scope: null
+    hive_tags:
+      - id: personal_email
+        content: turetek@gmail.com
+
+# Hive setup including tokens and groups with permissions and tags
+hive:
+  tokens:
+    - secret: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa
+      permissions:
+        - id: admin
+          scope: null
+  groups:
+    - name: Systemansvarig
+      id: d-sys
+      domain: example.com
+      members:
+        - turetek
+      tags:
+        - id: author-pseudonym
+          content: D-Sys
+        - id: mandate
+      permissions:
+        - id: admin
+          scope: null
 ```
 
 To build and run without docker and specifying custom ports:
@@ -144,21 +166,47 @@ configs:
   nyckeln.yaml:
     content: |
       clients:
-        - id: "client-id"
-          secret: "client-secret"
-          redirect_uris:
-            - "http://localhost:4000/oidcc/callback"
-            - "http://localhost:4000/oidcc/authorize"
+        - id: "client-id" # use this in your oidc client
+          secret: "client-secret" # use this in your oidc client
+          redirect_uris: # URIs of your oidc client
+            [
+              "http://localhost:4000/oidcc/callback",
+              "http://localhost:4000/oidcc/authorize",
+            ]
 
       users:
-        - kth_id: turetek
+        - ug_kth_id: some-id
+          kth_id: turetek
           email: turetek@kth.se
           first_name: Ture
           family_name: Teknolog
-          hive_permissions:
-            - id: admin
-              scope: null
           pls_permissions:
             sso:
-              - fippel
+              - admin
+            calypso:
+              - drek
+              - dfunk
+          hive_tags:
+            - id: personal_email
+              content: turetek@gmail.com
+
+      hive:
+        tokens:
+          - secret: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa
+            permissions:
+              - id: admin
+                scope: null
+        groups:
+          - name: Systemansvarig
+            id: d-sys
+            domain: example.com
+            members:
+              - turetek
+            tags:
+              - id: author-pseudonym
+                content: D-Sys
+              - id: mandate
+            permissions:
+              - id: admin
+                scope: null
 ```

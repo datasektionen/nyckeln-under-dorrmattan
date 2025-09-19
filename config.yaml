@@ -25,6 +25,7 @@ users:
       - id: personal_email
         content: turetek@gmail.com
 
+# Hive setup including tokens and groups with permissions and tags
 hive:
   tokens:
     - secret: aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa
