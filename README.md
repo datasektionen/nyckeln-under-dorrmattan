@@ -45,11 +45,18 @@ As in real Hive, you need to supply an `Authentication` header with `Bearer <tok
 - `GET /api/v1/group/:group_domain/:group_id/members`, returns a list of all members in group
 </details>
 
+<details>
+<summary>SSO API</summary>
+<br>
+
 Lastly, the sso part is a simple OpenID Connect (oidc) server which behaves the
 same way that sso does. You define your configuration and users in a yaml file,
 and then configure your favorite oidc client to use `http://localhost:{sso-port}/.well-known/openid-configuration`,
 and it should just work. When logging in, you will need to enter the username/kth-id of
 someone defined in your yaml config. Similarly to sso, also supports `pls_*` scopes.
+
+- `GET /api/users`, takes a list of users kthid (using repeated u query parameters) and a format query paramater and returns user information based on the format
+</details>
 
 ## Configuration
 
