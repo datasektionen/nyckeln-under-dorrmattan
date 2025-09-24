@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"maps"
@@ -83,7 +84,7 @@ type User struct {
 	FirstNameChangeRequest  string              `yaml:"first_name_change_request"`
 	FamilyNameChangeRequest string              `yaml:"family_name_change_request"`
 	PlsPermissions          map[string][]string `yaml:"pls_permissions"`
-	HiveTags				[]HiveTag			`yaml:"hive_tags"`
+	HiveTags                []HiveTag           `yaml:"hive_tags"`
 }
 
 func New(cfg *config.Config) *Dao {
@@ -124,6 +125,21 @@ func (d *Dao) GetUser(kthid string) (*User, error) {
 		}
 	}
 	return nil, fmt.Errorf("user not found")
+}
+
+func (d *Dao) ListUsers(query string, year string) []User {
+	users := []User{}
+	for _, user := range d.db.Users {
+		if (user.KTHID == query ||
+			strings.Contains(user.FirstName, query) ||
+			strings.Contains(user.FamilyName, query) ||
+			strings.Contains(user.FirstName+" "+user.FamilyName, query)) &&
+			(year == user.YearTag || year == "") {
+
+			users = append(users, user)
+		}
+	}
+	return users
 }
 
 func (d *Dao) GetUserPermissionsForGroup(kthid string, group string) []string {

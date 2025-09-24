@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 	"sync/atomic"
 
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/config"
@@ -158,6 +159,61 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
+	})
+
+	mux.HandleFunc("GET /api/search", func(w http.ResponseWriter, r *http.Request) {
+		limitStr := r.FormValue("limit")
+		if limitStr == "" {
+			limitStr = "5"
+		}
+		i, err := strconv.ParseInt(limitStr, 10, 32)
+		if err != nil {
+			w.WriteHeader(http.StatusBadGateway)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		limit := int32(i)
+
+		offsetStr := r.FormValue("offset")
+		if offsetStr == "" {
+			offsetStr = "0"
+		}
+		i, err = strconv.ParseInt(offsetStr, 10, 32)
+		if err != nil {
+			w.WriteHeader(http.StatusBadGateway)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		offset := int32(i)
+
+		search := r.FormValue("query")
+		year := r.FormValue("year")
+
+		dbUsers := dao.ListUsers(search, year)
+
+		limitedUsers := dbUsers[offset:(min(offset+limit, int32(len(dbUsers))))]
+
+		type User struct {
+			KTHID      string `json:"kthid"`
+			Email      string `json:"email,omitempty"`
+			FirstName  string `json:"firstName,omitempty"`
+			FamilyName string `json:"familyName,omitempty"`
+			YearTag    string `json:"yearTag,omitempty"`
+		}
+
+		users := make([]User, len(dbUsers))
+		for i, user := range limitedUsers {
+			users[i] = User{
+				KTHID: user.KTHID,
+				Email: user.Email,
+				FirstName: user.FirstName,
+				FamilyName: user.FamilyName,
+				YearTag: user.YearTag,
+			}
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(users)
 	})
 
 	handler := func(next http.Handler) http.Handler {
