@@ -252,7 +252,9 @@ func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user
 
 		case "year_tag":
 			userinfo.Claims[scope] = user.YearTag
-
+		case "permissions":
+			perms := s.dao.GetHivePermissions(user.KTHID)
+			userinfo.Claims[scope] = perms
 		default:
 			if group, ok := strings.CutPrefix(scope, "pls_"); ok {
 				perms := s.dao.GetUserPermissionsForGroup(user.KTHID, group)

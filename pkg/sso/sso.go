@@ -48,7 +48,7 @@ var (
 	counter atomic.Int64
 )
 
-var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "pls_*", "year_tag"}
+var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "pls_*", "permissions", "year_tag"}
 
 type auth interface {
 	CheckLogin(kthid, id string) error
@@ -96,6 +96,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			"name", "family_name", "given_name",
 			"email", "email_verified",
 			"pls_*",
+			"permissions",
 			"year_tag",
 		},
 		SupportedScopes: SupportedScopes,
