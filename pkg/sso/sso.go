@@ -222,6 +222,8 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			attr := slog.Int64("id", counter.Add(1))
 			logger.With(attr).Debug("request", "method", r.Method, "url", r.URL.Path)
 
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+
 			next.ServeHTTP(w, r)
 		})
 	}(mux)
