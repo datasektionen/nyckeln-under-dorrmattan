@@ -78,10 +78,7 @@ clients:
   - id: "client-id" # use this in your oidc client
     secret: "client-secret" # use this in your oidc client
     redirect_uris: # URIs of your oidc client
-      [
-        "http://localhost:4000/oidcc/callback",
-        "http://localhost:4000/oidcc/authorize",
-      ]
+      - http://localhost:4000/oidcc/callback
 
 # Users to log in via sso, and their pls permissions
 users:
@@ -169,10 +166,7 @@ configs:
         - id: "client-id" # use this in your oidc client
           secret: "client-secret" # use this in your oidc client
           redirect_uris: # URIs of your oidc client
-            [
-              "http://localhost:4000/oidcc/callback",
-              "http://localhost:4000/oidcc/authorize",
-            ]
+            - http://localhost:4000/oidcc/callback
 
       users:
         - ug_kth_id: some-id
