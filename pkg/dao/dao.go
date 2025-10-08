@@ -61,15 +61,15 @@ type HivePermission struct {
 }
 
 type HiveTagGroup struct {
-	GroupName   string
-	GroupId     string
-	GroupDomain string
-	TagContent  string
+	GroupName   string `json:"group_name"`
+	GroupId     string `json:"group_id"`
+	GroupDomain string `json:"group_domain"`
+	TagContent  string `json:"tag_content"`
 }
 
 type HiveTagUser struct {
-	Username   string
-	TagContent string
+	Username   string `json:"username"`
+	TagContent string `json:"tag_content"`
 }
 
 type User struct {
