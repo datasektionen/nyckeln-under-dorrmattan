@@ -48,7 +48,7 @@ var (
 	counter atomic.Int64
 )
 
-var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "pls_*", "permissions", "year_tag"}
+var SupportedScopes = []string{"openid", "profile", "email", "offline_access", "pls_*", "permissions", "picture", "year_tag"}
 
 type auth interface {
 	CheckLogin(kthid, id string) error
@@ -58,6 +58,7 @@ type ssoUser struct {
 	Email      string `json:"email,omitempty"`
 	FirstName  string `json:"firstName,omitempty"`
 	FamilyName string `json:"familyName,omitempty"`
+	Picture    string `json:"picture,omitempty"`
 	YearTag    string `json:"yearTag,omitempty"`
 }
 
@@ -97,6 +98,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			"email", "email_verified",
 			"pls_*",
 			"permissions",
+			"picture",
 			"year_tag",
 		},
 		SupportedScopes: SupportedScopes,
@@ -131,17 +133,31 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 				w.WriteHeader(http.StatusNotFound)
 				return
 			}
-			resp := ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag}
+			var picture string
+			if r.FormValue("picture") == "full" {
+				picture = user.Picture
+			} else if r.FormValue("picture") == "thumbnail" {
+				picture = user.Thumbnail
+			} else {
+				picture = ""
+			}
+			resp := ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag}
 			w.Header().Add("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(resp)
 		case "array":
 			users := []ssoUser{}
 			for _, kthid := range kthids {
 				user, err := dao.GetUser(kthid)
-				if err != nil {
-					users = append(users, ssoUser{})
-				} else {
-					users = append(users, ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag})
+				if err == nil {
+					var picture string
+					if r.FormValue("picture") == "full" {
+						picture = user.Picture
+					} else if r.FormValue("picture") == "thumbnail" {
+						picture = user.Thumbnail
+					} else {
+						picture = ""
+					}
+					users = append(users, ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag})
 				}
 			}
 			w.Header().Add("Content-Type", "application/json")
@@ -151,7 +167,15 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			for _, kthid := range kthids {
 				user, err := dao.GetUser(kthid)
 				if err == nil {
-					users[kthid] = ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, YearTag: user.YearTag}
+					var picture string
+					if r.FormValue("picture") == "full" {
+						picture = user.Picture
+					} else if r.FormValue("picture") == "thumbnail" {
+						picture = user.Thumbnail
+					} else {
+						picture = ""
+					}
+					users[kthid] = ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag}
 				}
 			}
 			w.Header().Add("Content-Type", "application/json")
@@ -199,17 +223,27 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			Email      string `json:"email,omitempty"`
 			FirstName  string `json:"firstName,omitempty"`
 			FamilyName string `json:"familyName,omitempty"`
+			Picture    string `json:"picture"`
 			YearTag    string `json:"yearTag,omitempty"`
 		}
 
 		users := make([]User, len(dbUsers))
 		for i, user := range limitedUsers {
+			var picture string
+			if r.FormValue("picture") == "full" {
+				picture = user.Picture
+			} else if r.FormValue("picture") == "thumbnail" {
+				picture = user.Thumbnail
+			} else {
+				picture = ""
+			}
 			users[i] = User{
-				KTHID: user.KTHID,
-				Email: user.Email,
-				FirstName: user.FirstName,
+				KTHID:      user.KTHID,
+				Email:      user.Email,
+				FirstName:  user.FirstName,
 				FamilyName: user.FamilyName,
-				YearTag: user.YearTag,
+				Picture:    picture,
+				YearTag:    user.YearTag,
 			}
 		}
 

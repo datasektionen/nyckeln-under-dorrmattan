@@ -79,6 +79,8 @@ type User struct {
 	Email                   string              `yaml:"email"`
 	FirstName               string              `yaml:"first_name"`
 	FamilyName              string              `yaml:"family_name"`
+	Picture                 string              `yaml:"picture"`
+	Thumbnail               string              `yaml:"thumbnail"`
 	YearTag                 string              `yaml:"year_tag"`
 	MemberTo                time.Time           `yaml:"member_to"`
 	WebAuthnID              []byte              `yaml:"web_authn_id"`
