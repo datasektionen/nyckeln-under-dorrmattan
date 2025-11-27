@@ -19,9 +19,10 @@ type Dao struct {
 }
 
 type db struct {
-	Clients     []Client `yaml:"clients"`
-	Users       []User   `yaml:"users"`
-	Hive        Hive     `yaml:"hive"`
+	Clients     []Client   `yaml:"clients"`
+	Users       []User     `yaml:"users"`
+	Hive        Hive       `yaml:"hive"`
+	Ldap        []LdapUser `yaml:"ldap"`
 	permissions map[string]map[string][]string
 }
 
@@ -87,6 +88,13 @@ type User struct {
 	HiveTags                []HiveTag           `yaml:"hive_tags"`
 }
 
+type LdapUser struct {
+	KTHID      string `yaml:"kth_id" json:"kthid"`
+	UGKTHID    string `yaml:"ug_kth_id" json:"ug_kthid"`
+	FirstName  string `yaml:"first_name" json:"first_name"`
+	FamilyName string `yaml:"family_name" json:"last_name"`
+}
+
 func New(cfg *config.Config) *Dao {
 	file, err := os.ReadFile(cfg.ConfigFile)
 	if err != nil {
@@ -120,6 +128,15 @@ func (d *Dao) GetClient(id string) (*Client, error) {
 
 func (d *Dao) GetUser(kthid string) (*User, error) {
 	for _, user := range d.db.Users {
+		if user.KTHID == kthid {
+			return &user, nil
+		}
+	}
+	return nil, fmt.Errorf("user not found")
+}
+
+func (d *Dao) GetLdapUser(kthid string) (*LdapUser, error) {
+	for _, user := range d.db.Ldap {
 		if user.KTHID == kthid {
 			return &user, nil
 		}

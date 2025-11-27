@@ -1,7 +1,8 @@
 # Nyckeln under dörrmattan
 
 Mock version of [login](https://github.com/datasektionen/login),
-[pls](https://github.com/datasektionen/pls), [hive](https://github.com/datasektionen/hive), and [sso](https://github.com/datasektionen/sso).
+[pls](https://github.com/datasektionen/pls), [hive](https://github.com/datasektionen/hive),
+[sso](https://github.com/datasektionen/sso), and [ldap-proxy](https://github.com/datasektionen/ldap-proxy).
 
 The login part can be used as a drop in replacement, but it requires no
 configuration, and automatically lets everyone in as Ture Teknolog. You
@@ -58,6 +59,15 @@ someone defined in your yaml config. Similarly to sso, also supports `pls_*` sco
 - `GET /api/users`, takes a list of users kthid (using repeated u query parameters) and a format query paramater and returns user information based on the format
 </details>
 
+<details>
+<summary>ldap-proxy API</summary>
+<br>
+
+The ldap-porxy part mocks the systems only endpoint but without the ability to search for ug_kth_id with a simple config interface in the yaml file.
+
+- `GET /user`, takes a kthid as a query parameter and returns basic information about the user if it exists.
+</details>
+
 ## Configuration
 
 You can configure the following flags:
@@ -66,6 +76,7 @@ You can configure the following flags:
 - `login-port`: Port for the login service. Defaults to 7002.
 - `sso-port`: Port for the sso service. Defaults to 7003.
 - `hive-port`: Port for the hive service. Defaults to 7004.
+- `ldap-port`: Port for the kthldap service. Defaults to 7005.
 - `hodis-url`: URL to the hodis instance. Defaults to `https://hodis.datasektionen.se`.
 - `kth-id`: Username to use for login. Defaults to `KTH_ID` environment variable, or `turetek` if not set.
 - `config-file`: Path to a yaml config file. Defaults to `config.yaml`.
@@ -117,6 +128,13 @@ hive:
       permissions:
         - id: admin
           scope: null
+
+# Ldap proxy setup
+ldap:
+  - ug_kth_id: some-other-id
+    kth_id: marmas
+    first_name: Markus
+    family_name: Maskinare
 ```
 
 To build and run without docker and specifying custom ports:
@@ -203,4 +221,10 @@ configs:
             permissions:
               - id: admin
                 scope: null
+
+      ldap:
+        - ug_kth_id: some-other-id
+          kth_id: marmas
+          first_name: Markus
+          family_name: Maskinare
 ```

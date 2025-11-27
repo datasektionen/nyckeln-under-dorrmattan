@@ -42,3 +42,10 @@ hive:
       permissions:
         - id: admin
           scope: null
+
+# Ldap proxy setup
+ldap:
+  - ug_kth_id: some-other-id
+    kth_id: marmas
+    first_name: Markus
+    family_name: Maskinare
