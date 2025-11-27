@@ -14,6 +14,7 @@ import (
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/login"
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/pls"
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/sso"
+	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/kthldap"
 
 	"golang.org/x/term"
 )
@@ -30,6 +31,7 @@ func main() {
 	go pls.Listen(cfg, dao)
 	go sso.Listen(cfg, dao)
 	go hive.Listen(cfg, dao)
+	go kthldap.Listen(cfg, dao)
 
 	if term.IsTerminal(int(os.Stdin.Fd())) {
 		stdin := bufio.NewReader(os.Stdin)
