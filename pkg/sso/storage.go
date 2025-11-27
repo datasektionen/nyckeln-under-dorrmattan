@@ -140,12 +140,35 @@ func (s *storage) CheckLogin(kthid, id string) error {
 		return fmt.Errorf("request not found")
 	}
 
-	user, err := s.dao.GetUser(kthid)
+	client, err := s.dao.GetClient(request.GetClientID())
+
 	if err != nil {
 		return err
 	}
-	if user.KTHID != kthid {
-		return fmt.Errorf("invalid kthid")
+
+	if client.AllowsGuests {
+		ldapUser, err := s.dao.GetLdapUser(kthid)
+		if err != nil {
+			user, err := s.dao.GetUser(kthid)
+			if err != nil {
+				return err
+			}
+			if user.KTHID != kthid {
+				return fmt.Errorf("invalid kthid")
+			}
+		} else {
+			if ldapUser.KTHID != kthid {
+				return fmt.Errorf("invalid guest kthid")
+			}
+		}
+	} else {
+		user, err := s.dao.GetUser(kthid)
+		if err != nil {
+			return err
+		}
+		if user.KTHID != kthid {
+			return fmt.Errorf("invalid kthid")
+		}
 	}
 
 	request.kthid = kthid
@@ -192,12 +215,13 @@ func (s *storage) SetIntrospectionFromToken(ctx context.Context, userinfo *oidc.
 
 // SetUserinfoFromScopes implements op.Storage.
 func (s *storage) SetUserinfoFromScopes(ctx context.Context, userinfo *oidc.UserInfo, kthid string, clientID string, scopes []string) error {
-	user, err := s.dao.GetUser(kthid)
-	if err != nil {
-		return err
+	user, userErr := s.dao.GetUser(kthid)
+	guest, guestErr := s.dao.GetLdapUser(kthid)
+	if userErr != nil && guestErr != nil {
+		return nil
 	}
 
-	if err := s.setUserinfo(ctx, userinfo, user, scopes); err != nil {
+	if err := s.setUserinfo(ctx, userinfo, user, guest, scopes); err != nil {
 		return err
 	}
 	return nil
@@ -219,19 +243,28 @@ func (s *storage) SetUserinfoFromToken(ctx context.Context, userinfo *oidc.UserI
 		return fmt.Errorf("You're asking to get info about a different user than who the token is for")
 	}
 
-	user, err := s.dao.GetUser(kthid)
-	if err != nil {
-		return err
+	user, userErr := s.dao.GetUser(kthid)
+	guest, guestErr := s.dao.GetLdapUser(kthid)
+	if userErr != nil && guestErr != nil {
+		return nil
 	}
 
-	if err := s.setUserinfo(ctx, userinfo, user, token.scopes); err != nil {
+	if err := s.setUserinfo(ctx, userinfo, user, guest, token.scopes); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user *dao.User, scopes []string) error {
+func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user *dao.User, guest *dao.LdapUser, scopes []string) error {
+	if user == nil {
+		user = &dao.User{
+			KTHID:      guest.KTHID,
+			Email:      guest.KTHID + "@kth.se",
+			FirstName:  guest.FirstName,
+			FamilyName: guest.FamilyName,
+		}
+	}
 	if userinfo.Claims == nil {
 		userinfo.Claims = make(map[string]any)
 	}

@@ -29,6 +29,7 @@ type db struct {
 type Client struct {
 	Id           string   `yaml:"id"`
 	Secret       string   `yaml:"secret"`
+	AllowsGuests  bool     `yaml:"allows_guests"`
 	RedirectURIs []string `yaml:"redirect_uris"`
 }
 
@@ -143,7 +144,7 @@ func (d *Dao) GetLdapUser(kthid string) (*LdapUser, error) {
 			return &user, nil
 		}
 	}
-	return nil, fmt.Errorf("user not found")
+	return nil, fmt.Errorf("ldap user not found")
 }
 
 func (d *Dao) ListUsers(query string, year string) []User {

@@ -2,6 +2,7 @@
 clients:
   - id: "client-id" # use this in your oidc client
     secret: "client-secret" # use this in your oidc client
+    allows_guests: false
     redirect_uris: # URIs of your oidc client
       - http://localhost:4000/oidcc/callback
 

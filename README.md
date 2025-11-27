@@ -54,7 +54,8 @@ Lastly, the sso part is a simple OpenID Connect (oidc) server which behaves the
 same way that sso does. You define your configuration and users in a yaml file,
 and then configure your favorite oidc client to use `http://localhost:{sso-port}/.well-known/openid-configuration`,
 and it should just work. When logging in, you will need to enter the username/kth-id of
-someone defined in your yaml config. Similarly to sso, also supports `pls_*`, `permissions`, and `picture` scopes.
+someone defined in your yaml config. If allow guest is turned on it can also return users form the ldap part of the yaml.
+Similarly to sso, also supports `pls_*`, `permissions`, and `picture` scopes.
 
 - `GET /api/users`, takes a list of users kthid (using repeated u query parameters) and a format query parameter
     and returns user information based on the format. It also optionaly provides the users profile picture when supplied
@@ -91,6 +92,7 @@ The yaml config file is used for SSO (oidc) and pls configuration. For example:
 clients:
   - id: "client-id" # use this in your oidc client
     secret: "client-secret" # use this in your oidc client
+    allows_guests: false
     redirect_uris: # URIs of your oidc client
       - http://localhost:4000/oidcc/callback
 
@@ -188,6 +190,7 @@ configs:
       clients:
         - id: "client-id" # use this in your oidc client
           secret: "client-secret" # use this in your oidc client
+          allows_guests: false
           redirect_uris: # URIs of your oidc client
             - http://localhost:4000/oidcc/callback
 

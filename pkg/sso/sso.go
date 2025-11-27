@@ -273,7 +273,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 	}
 }
 
-func newLogin(auth auth, callback func(context.Context, string) string, issuerInterceptor *op.IssuerInterceptor) http.Handler {
+func newLogin(storage *storage, callback func(context.Context, string) string, issuerInterceptor *op.IssuerInterceptor) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
@@ -294,7 +294,7 @@ func newLogin(auth auth, callback func(context.Context, string) string, issuerIn
 				}
 				id := r.FormValue("id")
 				kthid := r.FormValue("kthid")
-				err = auth.CheckLogin(kthid, id)
+				err = storage.CheckLogin(kthid, id)
 				if err != nil {
 					renderLogin(w, id, err)
 					return
