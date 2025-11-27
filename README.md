@@ -53,9 +53,12 @@ Lastly, the sso part is a simple OpenID Connect (oidc) server which behaves the
 same way that sso does. You define your configuration and users in a yaml file,
 and then configure your favorite oidc client to use `http://localhost:{sso-port}/.well-known/openid-configuration`,
 and it should just work. When logging in, you will need to enter the username/kth-id of
-someone defined in your yaml config. Similarly to sso, also supports `pls_*` scopes.
+someone defined in your yaml config. Similarly to sso, also supports `pls_*`, `permissions`, and `picture` scopes.
 
-- `GET /api/users`, takes a list of users kthid (using repeated u query parameters) and a format query paramater and returns user information based on the format
+- `GET /api/users`, takes a list of users kthid (using repeated u query parameters) and a format query parameter
+    and returns user information based on the format. It also optionaly provides the users profile picture when supplied
+    with the picture query parameter.
+- `GET /api/search`, takes a query, offset, limit, and year parameters. It can also optionaly supply the users profile picture.
 </details>
 
 ## Configuration
@@ -87,6 +90,8 @@ users:
     email: turetek@kth.se
     first_name: Ture
     family_name: Teknolog
+    picture: https://thskth.se/wp-content/uploads/2023/06/ths-logo-bla-01-300x294-1.png
+    thumbnail: https://thskth.se/wp-content/uploads/2019/12/ths-logo-svart-01.png
     pls_permissions:
       sso:
         - admin
@@ -174,6 +179,8 @@ configs:
           email: turetek@kth.se
           first_name: Ture
           family_name: Teknolog
+          picture: https://thskth.se/wp-content/uploads/2023/06/ths-logo-bla-01-300x294-1.png
+          thumbnail: https://thskth.se/wp-content/uploads/2019/12/ths-logo-svart-01.png
           pls_permissions:
             sso:
               - admin

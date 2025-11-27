@@ -250,6 +250,8 @@ func (s *storage) setUserinfo(ctx context.Context, userinfo *oidc.UserInfo, user
 			userinfo.Email = user.Email
 			userinfo.EmailVerified = true
 
+		case "picture":
+			userinfo.Picture = user.Thumbnail
 		case "year_tag":
 			userinfo.Claims[scope] = user.YearTag
 		case "permissions":
