@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/datasektionen/nyckeln-under-dorrmattan/pkg/config"
@@ -195,7 +196,13 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 		}
 
 		tagId := r.PathValue("tag_id")
-		groups := dao.GetHiveTagGroups(tagId)
+		description, err := strconv.ParseBool(r.URL.Query().Get("description"))
+
+		if err != nil {
+			description = false
+		}
+
+		groups := dao.GetHiveTagGroups(tagId, description)
 
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(groups)
@@ -210,7 +217,13 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 
 		tagId := r.PathValue("tag_id")
 		username := r.PathValue("username")
-		groups := dao.GetHiveTagGroupsUser(tagId, username)
+		description, err := strconv.ParseBool(r.URL.Query().Get("description"))
+
+		if err != nil {
+			description = false
+		}
+
+		groups := dao.GetHiveTagGroupsUser(tagId, username, description)
 
 		w.Header().Add("Content-Type", "application/json;charset=utf-8")
 		json.NewEncoder(w).Encode(groups)

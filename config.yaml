@@ -34,6 +34,7 @@ hive:
           scope: null
   groups:
     - name: Systemansvarig
+      description: Responsible for the development and operation of the Chapter's systems. Leads the Systems Group.
       id: d-sys
       domain: example.com
       members:

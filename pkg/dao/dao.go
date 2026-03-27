@@ -29,7 +29,7 @@ type db struct {
 type Client struct {
 	Id           string   `yaml:"id"`
 	Secret       string   `yaml:"secret"`
-	AllowsGuests  bool     `yaml:"allows_guests"`
+	AllowsGuests bool     `yaml:"allows_guests"`
 	RedirectURIs []string `yaml:"redirect_uris"`
 }
 
@@ -45,6 +45,7 @@ type HiveToken struct {
 
 type HiveGroup struct {
 	Name        string           `yaml:"name"`
+	Description string           `yaml:"description"`
 	Id          string           `yaml:"id"`
 	Domain      string           `yaml:"domain"`
 	Members     []string         `yaml:"members"`
@@ -63,10 +64,11 @@ type HivePermission struct {
 }
 
 type HiveTagGroup struct {
-	GroupName   string `json:"group_name"`
-	GroupId     string `json:"group_id"`
-	GroupDomain string `json:"group_domain"`
-	TagContent  string `json:"tag_content"`
+	GroupName        string `json:"group_name"`
+	GroupDescription string `json:"group_description"`
+	GroupId          string `json:"group_id"`
+	GroupDomain      string `json:"group_domain"`
+	TagContent       string `json:"tag_content"`
 }
 
 type HiveTagUser struct {
@@ -209,12 +211,16 @@ func (d *Dao) GetHivePermissionsToken(tokenId string) []HivePermission {
 	return permissions
 }
 
-func (d *Dao) GetHiveTagGroups(tagId string) []HiveTagGroup {
+func (d *Dao) GetHiveTagGroups(tagId string, description bool) []HiveTagGroup {
 	tagGroups := []HiveTagGroup{}
 	for _, group := range d.db.Hive.Groups {
 		for _, tag := range group.Tags {
 			if tag.Id == tagId {
-				tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+				if description {
+					tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupDescription: group.Description, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+				} else {
+					tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+				}
 			}
 		}
 	}
@@ -222,14 +228,18 @@ func (d *Dao) GetHiveTagGroups(tagId string) []HiveTagGroup {
 	return tagGroups
 }
 
-func (d *Dao) GetHiveTagGroupsUser(tagId string, kthid string) []HiveTagGroup {
+func (d *Dao) GetHiveTagGroupsUser(tagId string, kthid string, description bool) []HiveTagGroup {
 	tagGroups := []HiveTagGroup{}
 	for _, group := range d.db.Hive.Groups {
 		for _, user := range group.Members {
 			if user == kthid {
 				for _, tag := range group.Tags {
 					if tag.Id == tagId {
-						tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+						if description {
+							tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupDescription: group.Description, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+						} else {
+							tagGroups = append(tagGroups, HiveTagGroup{GroupName: group.Name, GroupId: group.Id, GroupDomain: group.Domain, TagContent: tag.Content})
+						}
 					}
 				}
 			}
