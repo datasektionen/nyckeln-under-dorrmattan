@@ -29,15 +29,9 @@ configs:
           family_name: Teknolog
           picture: https://thskth.se/wp-content/uploads/2023/06/ths-logo-bla-01-300x294-1.png
           thumbnail: https://thskth.se/wp-content/uploads/2019/12/ths-logo-svart-01.png
-          pls_permissions:
-            sso:
-              - admin
-            calypso:
-              - drek
-              - dfunk
-          hive_tags:
-            - id: personal_email
-              content: turetek@gmail.com
+          membership: ordinary
+          nfc_id: 00:00:00:00:00:00:00
+          year_tag: D-83
 
       hive:
         tokens:

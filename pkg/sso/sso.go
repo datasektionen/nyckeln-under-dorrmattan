@@ -60,6 +60,7 @@ type ssoUser struct {
 	FamilyName string `json:"familyName,omitempty"`
 	Picture    string `json:"picture,omitempty"`
 	YearTag    string `json:"yearTag,omitempty"`
+	Membership string `json:"membership,omitempty"`
 }
 
 func Listen(cfg *config.Config, dao *dao.Dao) {
@@ -141,7 +142,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			} else {
 				picture = ""
 			}
-			resp := ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag}
+			resp := ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership}
 			w.Header().Add("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(resp)
 		case "array":
@@ -157,7 +158,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 					} else {
 						picture = ""
 					}
-					users = append(users, ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag})
+					users = append(users, ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership})
 				}
 			}
 			w.Header().Add("Content-Type", "application/json")
@@ -175,7 +176,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 					} else {
 						picture = ""
 					}
-					users[kthid] = ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag}
+					users[kthid] = ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership}
 				}
 			}
 			w.Header().Add("Content-Type", "application/json")
@@ -225,6 +226,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			FamilyName string `json:"familyName,omitempty"`
 			Picture    string `json:"picture"`
 			YearTag    string `json:"yearTag,omitempty"`
+			Membership string `json:"membership,omitempty"`
 		}
 
 		users := make([]User, len(dbUsers))
@@ -244,6 +246,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 				FamilyName: user.FamilyName,
 				Picture:    picture,
 				YearTag:    user.YearTag,
+				Membership: user.Membership,
 			}
 		}
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"maps"
 
@@ -85,7 +84,8 @@ type User struct {
 	Picture                 string              `yaml:"picture"`
 	Thumbnail               string              `yaml:"thumbnail"`
 	YearTag                 string              `yaml:"year_tag"`
-	MemberTo                time.Time           `yaml:"member_to"`
+	Membership              string              `yaml:"membership"`
+	NFCID                   string              `yaml:"nfc_id"`
 	WebAuthnID              []byte              `yaml:"web_authn_id"`
 	FirstNameChangeRequest  string              `yaml:"first_name_change_request"`
 	FamilyNameChangeRequest string              `yaml:"family_name_change_request"`
@@ -133,7 +133,7 @@ func (d *Dao) GetClient(id string) (*Client, error) {
 
 func (d *Dao) GetUser(kthid string) (*User, error) {
 	for _, user := range d.db.Users {
-		if user.KTHID == kthid {
+		if user.KTHID == kthid || user.NFCID == kthid {
 			return &user, nil
 		}
 	}
@@ -155,7 +155,8 @@ func (d *Dao) ListUsers(query string, year string) []User {
 		if (user.KTHID == query ||
 			strings.Contains(user.FirstName, query) ||
 			strings.Contains(user.FamilyName, query) ||
-			strings.Contains(user.FirstName+" "+user.FamilyName, query)) &&
+			strings.Contains(user.FirstName+" "+user.FamilyName, query) ||
+			user.NFCID == query) &&
 			(year == user.YearTag || year == "") {
 
 			users = append(users, user)
