@@ -55,6 +55,7 @@ type auth interface {
 }
 
 type ssoUser struct {
+	Kthid      string `json:"kthid,omitempty"`
 	Email      string `json:"email,omitempty"`
 	FirstName  string `json:"firstName,omitempty"`
 	FamilyName string `json:"familyName,omitempty"`
@@ -142,7 +143,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 			} else {
 				picture = ""
 			}
-			resp := ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership}
+			resp := ssoUser{Kthid: user.KTHID, Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership}
 			w.Header().Add("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(resp)
 		case "array":
@@ -158,7 +159,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 					} else {
 						picture = ""
 					}
-					users = append(users, ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership})
+					users = append(users, ssoUser{Kthid: user.KTHID, Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership})
 				}
 			}
 			w.Header().Add("Content-Type", "application/json")
@@ -176,7 +177,7 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 					} else {
 						picture = ""
 					}
-					users[kthid] = ssoUser{Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership}
+					users[kthid] = ssoUser{Kthid: user.KTHID, Email: user.Email, FirstName: user.FirstName, FamilyName: user.FamilyName, Picture: picture, YearTag: user.YearTag, Membership: user.Membership}
 				}
 			}
 			w.Header().Add("Content-Type", "application/json")
