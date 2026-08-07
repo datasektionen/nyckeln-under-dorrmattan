@@ -277,3 +277,11 @@ func (d *Dao) GetHiveMembership(groupDomain string, groupId string) []string {
 
 	return members
 }
+
+func (d *Dao) SetNFCID(kthid string, nfc_id string) {
+	for i := range d.db.Users {
+		if d.db.Users[i].KTHID == kthid {
+			d.db.Users[i].NFCID = nfc_id
+		}
+	}
+}

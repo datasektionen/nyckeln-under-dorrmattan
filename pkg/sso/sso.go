@@ -255,6 +255,24 @@ func Listen(cfg *config.Config, dao *dao.Dao) {
 		json.NewEncoder(w).Encode(users)
 	})
 
+	mux.HandleFunc("POST /api/nfc", func(w http.ResponseWriter, r *http.Request) {
+		type SetNFCIDParams struct {
+			Kthid string `json:"kthid"`
+			Nfcid string `json:"nfc_id"`
+		}
+
+		var params SetNFCIDParams
+		err := json.NewDecoder(r.Body).Decode(&params)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		dao.SetNFCID(params.Kthid, params.Nfcid)
+	})
+
 	handler := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			attr := slog.Int64("id", counter.Add(1))
